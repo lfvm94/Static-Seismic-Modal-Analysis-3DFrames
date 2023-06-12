@@ -18,9 +18,12 @@ function [FmaxMDOF,Te,lambda,fi]=ModalsMDOF3DFrames(M,K,bc,sa,mode)
 %                                    contribution of the given modes of 
 %                                    vibration
 %                               
-%                               mode-i -> The equivalent inertial forces are
-%                                       computed with the mode of
+%                               mode-i -> The equivalent inertial forces
+%                                       are computed with the mode of
 %                                       vibration inserted
+%
+%                                     2 -> acceleration in the x direction
+%                                     1 -> acceleration in the y direction
 %
 %    OUTPUT: lambda :           Modal of vibration for each DOF. 
 %                               Size: Nmodals x 1

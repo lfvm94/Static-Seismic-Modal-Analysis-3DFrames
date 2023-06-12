@@ -112,17 +112,6 @@ for i=1:nbars
     
 end
 
-%{
-% OOPTION 2: Exported from a SAP2000 model (the SM Toolbox is required)
-APIDLLPath ='C:\Program Files\Computers and Structures\SAP2000 22\SAP2000v1.dll';
-ProgramPath ='C:\Program Files\Computers and Structures\SAP2000 22\SAP2000.exe';
-
-ModelName = 'Frame_Ex01.sdb';
-ModelPath = fullfile('C:\Users\luizv\OneDrive\Pushover_3DFrames\FrameSAP2000_Ex01',ModelName);
-
-[coordxyz,NiNf]=ExtractTopologySAP2000(ProgramPath,APIDLLPath,...
-                                            ModelPath);
-%} 
 %% Prescribed boudnary conditions [dof, displacement]
 bc=[1 0;
     2 0;
@@ -184,10 +173,10 @@ eobars=[0 1 0;
         0 1 0];
     
 %% Loads       
-beams_LL=[1 -100; % Uniformly distributed loads over the beams
-          2 -100;
-          3 -100;
-          4 -100];
+beams_LL=[1 -50; % Uniformly distributed loads over the beams
+          2 -50;
+          3 -50;
+          4 -50];
 
 % Assignation of distributed loads on beams (local axis [x',y',z'])
 
@@ -195,13 +184,14 @@ qbarxyz=zeros(nbars,4);
 qbarxyz(elembeams',3)=beams_LL(:,2);
 
 %% Mode of vibration of interest
-modal=1;
+modal=2; % 2 -> acceleration in the x direction
+         % 1 -> acceleration in the y direction
 
 %% Seismic response spectrum from the CFE-15
 
 g=981; % gravity acceleration
 Fsit=2.4; FRes=3.8; % Factores de sitio y de respuesta
-a0_tau=200; % cm/seg^2
+a0_tau=100; % cm/seg^2
 
 ro=0.8; % Redundance factor
 alf=0.9; % Irregularity factor
@@ -218,25 +208,14 @@ R=Ro+1-sqrt(Te/Ta); % Over-resistance factor
 
 sa=-a0_tau*Fsit*FRes/(R*Qp*alf*ro); % Reduced pseudo-acceleration (cm/seg^2)
 
-% Decomposing sa as a resultant in the x,y plane at 45°
-saxy=sqrt(sa^2/2);
-
 %% Modal analysis
 pvconc=0.0024; % unit weight of concrete
 unitWeightElm=zeros(nbars,1)+pvconc;
 
-% Consistent mass method in the X direction
-[fmaxDOF1,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
+% Consistent mass method
+[fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
 (coordxyz,A,unitWeightElm,qbarxyz,eobars,Edof,bc,E,G,J,Iy,Iz,NiNf(:,1),...
-NiNf(:,2),[saxy 0],g,modal);
-
-% Consistent mass method in the Y direction
-[fmaxDOF2,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
-(coordxyz,A,unitWeightElm,qbarxyz,eobars,Edof,bc,E,G,J,Iy,Iz,NiNf(:,1),...
-NiNf(:,2),[0 saxy],g,modal);
-
-% Computing the resultant seismic forces in both directions
-fmaxDOF=sqrt(fmaxDOF1.^2+fmaxDOF2.^2);
+NiNf(:,2),sa,g,modal);
 
 %% Static structural analysis with seismic forces
 np=7; % number of analysis points for the mechanical elements
@@ -244,7 +223,7 @@ np=7; % number of analysis points for the mechanical elements
 [edi,eci,displacements,reactions,Ex,Ey,Ez,esbarsnormal,esbarssheary,...
 esbarsshearz,esbarstorsion,esbarsmomenty,esbarsmomentz]=StaticLinear3DFrames...
 (E,A,Iz,Iy,G,J,bc,fmaxDOF,[1:6*nnodes],NiNf(:,1),NiNf(:,2),...
-qbarxyz,5,coordxyz,eobars,1,[]);
+qbarxyz,5,coordxyz,eobars,1,[],1);
 
 %% Plot of the modal in question and its frequency
 Freq=1./T;

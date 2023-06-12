@@ -1,10 +1,10 @@
 function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
     (coordxyz,A,unitWeightEl,qbarxyz,eobars,Edof,bc,E,G,J,Iy,Iz,ni,nf,...
-    acelxy,g,modal)
+    acel,g,modal)
 % SYNTAX : 
 % [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
 %  (coordxyz,A,unitWeightEl,qbarxyz,Edof,bc,E,G,J,Iy,Iz,ni,nf,...
-%  acelxy,g,modal)
+%  acel,g,modal)
 %---------------------------------------------------------------------
 %    PURPOSE
 %     To compute the global stiffness matrix of a plane frame as well as
@@ -23,13 +23,8 @@ function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
 %
 %            bc:                Boundary condition array
 %
-%            acelxy:            Components of the ground acceleration [x,y]
-%                               Only one direction is allowed to be
-%                               analysed for each analysis. Therefore, when
-%                               analysing with respect to the x global axis
-%                               set acelxy = [sax 0], and for the y global
-%                               axis acelxy = [0 say],
-%
+%            acelxy:            Ground acceleration
+%                              
 %            modal:             Mode of vibration of interest:
 %                               [mode-1,mode-2,...] -> The equivalent 
 %                                    inertial forces are computed with the
@@ -39,6 +34,9 @@ function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
 %                               mode-i -> The equivalent inertial forces are
 %                                       computed with the mode of
 %                                       vibration inserted
+%
+%                                   2 -> acceleration in the x direction
+%                                   1 -> acceleration in the y direction
 %
 %            g:                 gravity acceleration
 %
@@ -91,13 +89,13 @@ for i=1:nbars
     
     %% Mass matrix
     PV=unitWeightEl(i,1)-qbarxyz(i,3)/A(i); % unit weight of each element
-                                          % The distributed downward loads
-                                          % on the BEAMS are considered.
-    [Mebar]=FiniteMassBeams3D(ex,ey,ez,eo,A(i),PV,g,acelxy);
+                                           % The distributed downward loads
+                                           % on the BEAMS are considered.
+    [Mebar]=FiniteMassBeams3D(ex,ey,ez,eo,A(i),Iy(i),Iz(i),PV,g);
     [Kgl]=assem(Edof(i,:),Kgl,Kebar);
     [Mgl]=assem(Edof(i,:),Mgl,Mebar);
 end 
 
 %% Modal analysis
-[fmaxDOF,T,La,Egv]=ModalsMDOF3DFrames(Mgl,Kgl,bc,sum(acelxy),modal);
+[fmaxDOF,T,La,Egv]=ModalsMDOF3DFrames(Mgl,Kgl,bc,acel,modal);
 

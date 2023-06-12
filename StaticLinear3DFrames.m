@@ -1,12 +1,12 @@
 function [edibars,ecibars,displacements,reactions,Ex,Ey,Ez,esbarsNormal,...
     esbarsShearY,esbarsShearZ,esbarsTorsion,esbarsMomentY,esbarsMomentZ]=...
     StaticLinear3DFrames(E,A,Iz,Iy,G,J,bc,extForce,dofForce,ni,nf,qbarxyzw,...
-    np,coordxyz,eobars,plDef,barMech)
+    np,coordxyz,eobars,plDef,barMech,magnfac)
 % SYNTAX : 
 % [edibars,ecibars,displacements,reactions,Ex,Ey,Ez,esbarsNormal,...
 %  esbarsShearY,esbarsShearZ,esbarsTorsion,esbarsMomenty,esbarsMomentZ]=...
 %  StaticLinear3DFrames(E,A,Iz,Iy,G,J,bc,extForce,dofForce,ni,nf,qbarz,...
-%  np,coordxyz,eobars,plDef,barMech)
+%  np,coordxyz,eobars,plDef,barMech,magnfac)
 %---------------------------------------------------------------------
 %    PURPOSE
 %     To perform a static linear analysis for a 3D Frame.
@@ -49,6 +49,9 @@ function [edibars,ecibars,displacements,reactions,Ex,Ey,Ez,esbarsNormal,...
 %
 %            barMech:           list of bars for which it is required to
 %                               visualize its mechanical elements
+%
+%            magnfac:           factor of displacements amplification for 
+%                               the plot of deformation
 %
 %    OUTPUT: 
 %
@@ -194,7 +197,6 @@ if plDef==1
     eldraw3(Ex,Ey,Ez,plotpar,elnum)
     
     % Deformed structure
-    magnfac=100;
     Ed=extract(Edof,displacements);
     plotpar=[1,3,1];
     [magnfac]=eldisp3(Ex,Ey,Ez,Ed,plotpar,magnfac);
