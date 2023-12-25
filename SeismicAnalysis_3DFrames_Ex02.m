@@ -250,23 +250,7 @@ modal=1; % 2 -> acceleration in the x direction
 %% Seismic response spectrum from the CFE-15
 
 g=981; % gravity acceleration
-Fsit=2.4; FRes=3.8; % Factores de sitio y de respuesta
-a0_tau=100; % cm/seg^2
-
-ro=0.8; % Redundance factor
-alf=0.9; % Irregularity factor
-Q=4; % Seismic behaviour factor
-
-Ta=0.1;
-Tb=0.6;
-Te=0.5; % Structure's period
-k=1.5; % Design spectrum slope
-Qp=1+(Q-1)*sqrt(Te/(k*Tb)); % Ductility factor
-
-Ro=2.5; % Over-resistance index
-R=Ro+1-sqrt(Te/Ta); % Over-resistance factor
-
-sa=-a0_tau*Fsit*FRes/(R*Qp*alf*ro); % Reduced pseudo-acceleration (cm/seg^2);
+DS=1;
 
 %% Modal analysis
 pvconc=0.0024; % unit weight of concrete
@@ -275,7 +259,7 @@ unitWeightElm=zeros(nbars,1)+pvconc;
 % Consistent mass method
 [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
 (coordxyz,A,unitWeightElm,qbarxyz,eobars,Edof,bc,E,G,J,Iy,Iz,NiNf(:,1),...
-NiNf(:,2),sa,g,modal);
+NiNf(:,2),DS,g,modal);
 
 %% Static structural analysis with seismic forces
 np=7; % number of analysis points for the mechanical elements
@@ -283,7 +267,7 @@ np=7; % number of analysis points for the mechanical elements
 [edi,eci,displacements,reactions,Ex,Ey,Ez,esbarsnormal,esbarssheary,...
 esbarsshearz,esbarstorsion,esbarsmomenty,esbarsmomentz]=StaticLinear3DFrames...
 (E,A,Iz,Iy,G,J,bc,fmaxDOF,[1:6*nnodes],NiNf(:,1),NiNf(:,2),...
-qbarxyz,5,coordxyz,eobars,1,[],1);
+qbarxyz,5,coordxyz,eobars,1,[],100);
 
 %% Plot of the modal in question and its frequency
 Freq=1./T;

@@ -1,10 +1,10 @@
-function [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
+function [fmaxDOF,Mgl,Kgl,T,La,Egv,Ma]=SeismicModalMDOF3DFrames...
     (coordxyz,A,unitWeightEl,qbarxyz,eobars,Edof,bc,E,G,J,Iy,Iz,ni,nf,...
-    acel,g,modal)
+    DS,g,modal)
 % SYNTAX : 
 % [fmaxDOF,Mgl,Kgl,T,La,Egv]=SeismicModalMDOF3DFrames...
 %  (coordxyz,A,unitWeightEl,qbarxyz,Edof,bc,E,G,J,Iy,Iz,ni,nf,...
-%  acel,g,modal)
+%  DS,g,modal)
 %---------------------------------------------------------------------
 %    PURPOSE
 %     To compute the global stiffness matrix of a plane frame as well as
@@ -97,5 +97,5 @@ for i=1:nbars
 end 
 
 %% Modal analysis
-[fmaxDOF,T,La,Egv]=ModalsMDOF3DFrames(Mgl,Kgl,bc,acel,modal);
+[fmaxDOF,T,La,Egv,Ma]=ModalsMDOF3DFrames(Mgl,Kgl,bc,DS,modal);
 
